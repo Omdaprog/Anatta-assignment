@@ -1,4 +1,4 @@
-import Client from "./client";
+import Client from "./client.js";
 
 // Function to fetch products by name
 export const fetchProductsByName = async (productName) => {
