@@ -1,18 +1,16 @@
-import { fetchProductsByName } from '../../shopify/functions.js'; // Update with the correct path
+import { fetchProductsByName } from '../../shopify/functions.js'; 
 import Client from '../../shopify/client.js';
 
-jest.mock('../../shopify/client.js'); // Mock the Client module
+jest.mock('../../shopify/client.js');
 
 describe('fetchProductsByName', () => {
     const mockProductName = 'Test Product';
 
     beforeEach(() => {
-        // Clear all instances and calls to constructor and all methods:
         jest.clearAllMocks();
     });
 
     it('should fetch products by name and return them', async () => {
-        // Mocking the response of Client.request
         Client.request.mockResolvedValueOnce({
             data: {
                 products: {

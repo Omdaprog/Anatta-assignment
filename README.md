@@ -51,4 +51,13 @@ To run the tests, use the following command:
 
 ```bash
 npm test
+This image shows the successful output of a unit test suite for the project. The test summary indicates:
 
+- **Test Suites**: 2 passed out of 2 total
+- **Tests**: 4 tests passed in total
+- **Snapshots**: 0 snapshots used
+- **Time**: The tests completed in 0.309 seconds, with an estimated duration of 1 second
+
+Each test suite (`function.test.js` in `test/shopify/` and `general.test.js` in `test/utils/`) has passed, confirming that the key components are functioning as expected.
+
+![Test Output](./assets/image.png)
