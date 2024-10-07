@@ -18,7 +18,7 @@ async function main() {
         }
         displayProducts(products);
     } catch (error) {
-        console.error('Error:', error.message);
+        console.error('Error:', error);
     }
 }
 
