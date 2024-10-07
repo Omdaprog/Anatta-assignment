@@ -2,10 +2,6 @@ import { fetchProductsByName } from './shopify/functions.js';
 import { displayProducts } from './utils/general.js';
 import { getParameters } from './utils/yargs.js';
 
-
-
-
-// Main function
 async function main() {
     try {
         const productName = getParameters()
