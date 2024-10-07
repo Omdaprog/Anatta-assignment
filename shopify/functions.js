@@ -1,30 +1,66 @@
 import Client from "./client.js";
 
-// fetch paginated variants for a product
-const fetchAllVariantsForProduct = async (product, operation, variables) => {
-    let variants = product.variants.edges;
-    let variantCursor = null;
+const fetchAllVariantsForProducts = async (productId) => {
+    const operation = `
+        query getProductVariants($id: ID!, $afterVariant: String) {
+            product(id: $id) {
+                title
+                variants(first: 250, after: $afterVariant) {
+                    edges {
+                        node {
+                            title
+                            price
+                        }
+                        cursor
+                    }
+                    pageInfo {
+                        hasNextPage
+                    }
+                }
+            }
+        }
+    `;
 
-    // Paginate through variants if it has next 
-    while (product.variants.pageInfo.hasNextPage) {
-        // operation has to be changed
-        const variantResponse = await Client.request(operation, {
+    try {
+        let variants = [];
+        let variantCursor = null;
+
+        // Fetch the initial product with variants
+        const initialResponse = await Client.request(operation, {
             variables: {
-                ...variables,
+                id: productId,
                 afterVariant: variantCursor,
             },
         });
+        let product = initialResponse.data.product;
+        variants = product?.variants?.edges;
 
-        const newVariants = variantResponse.data.products.edges[0].node.variants.edges;
-        variants = [...variants, ...newVariants];  // Append new variants
-        variantCursor = newVariants[newVariants.length - 1].cursor;  // Update variant cursor
+        // Paginate through variants if it has nextPage
+        while (product.variants.pageInfo.hasNextPage) {
+            const variantResponse = await Client.request(operation, {
+                variables: {
+                    id: productId,
+                    afterVariant: variantCursor,
+                },
+            });
+
+
+
+            const newVariants = variantResponse.data.product.variants.edges;
+            variants = [...variants, ...newVariants];
+            variantCursor = newVariants[newVariants.length - 1]?.cursor; 
+            product = variantResponse.data.product
+        }
+
+        return {
+            ...product,
+            variants: variants.map(variant => variant.node),
+        };
+    } catch (error) {
+        throw error;
     }
-
-    return {
-        ...product,
-        variants: variants.map(variant => variant.node),  // Return all variants
-    };
 };
+
 
 // fetch paginated products by name
 const fetchAllProductsByName = async (operation, variables) => {
@@ -45,12 +81,22 @@ const fetchAllProductsByName = async (operation, variables) => {
 
             for (let product of products) {
                 // Fetch all variants for each product
-                const productWithVariants = await fetchAllVariantsForProduct(product.node, operation, variables);
-                allProducts.push(productWithVariants);
+                if(product?.node?.variants?.pageInfo?.hasNextPage){
+                    const productWithVariants = await fetchAllVariantsForProducts(product.node.id);
+                    allProducts.push(productWithVariants);
+                }else{
+                    allProducts.push(
+                        {
+                            ...product?.node,
+                            variants: product?.node?.variants?.edges?.map(variant => variant.node),
+                        }
+                    )
+                }
             }
             productCursor = products[products.length - 1]?.cursor || null;
-
-        } while (response.data.products.pageInfo.hasNextPage);  // Continue until all products are fetched
+            
+            // Continue until all products are fetched
+        } while (response.data.products.pageInfo.hasNextPage);  
         return allProducts;
     } catch (error) {
         throw error;
@@ -70,7 +116,8 @@ export const fetchProductsByName = async (productName) => {
 		edges {
 			node {
 				title
-				variants(first: 250, after: $afterVariant) {
+                id
+				variants(first: 80, after: $afterVariant) {
 					edges {
 						node {
 							title
@@ -92,7 +139,7 @@ export const fetchProductsByName = async (productName) => {
 }`;
 
     const variables = {
-        first: 250,
+        first: 10,
         searchTerm: `title:*${productName}*`,
     };
 
