@@ -39,7 +39,7 @@ Run the script using the command:
 
 ```bash
 node app.js --name "<product name>"
-
+```
 ## Unit Tests
 
 This project includes unit tests to ensure the functionality of key components. The test suite covers:
