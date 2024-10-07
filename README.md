@@ -51,6 +51,7 @@ To run the tests, use the following command:
 
 ```bash
 npm test
+```
 This image shows the successful output of a unit test suite for the project. The test summary indicates:
 
 - **Test Suites**: 2 passed out of 2 total
