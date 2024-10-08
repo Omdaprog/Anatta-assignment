@@ -1,9 +1,13 @@
 import { fetchProductsByName } from './shopify/functions.js';
+import { SHOPIFY_ACCESS_TOKEN, SHOPIFY_STORE_DOMAIN } from './utils/constants.js';
 import { displayProducts } from './utils/general.js';
 import { getParameters } from './utils/yargs.js';
 
 async function main() {
     try {
+        if(!SHOPIFY_STORE_DOMAIN || !SHOPIFY_ACCESS_TOKEN){
+            console.log("please add your ENV variables");
+        }
         const productName = getParameters()
         if (productName === null) {
             console.log("please input the product name")
